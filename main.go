@@ -22,7 +22,6 @@ func generateRandomElements(size int) []int {
 	}
 
 	slice := make([]int, size)
-	rand.Seed(10)
 
 	for i := 0; i < size; i++ {
 		slice[i] = rand.Intn(1000) + 1
@@ -65,28 +64,24 @@ func maxChunks(data []int) int {
 	for i := 0; i < CHUNKS; i++ {
 		wg.Add(1)
 
-		start := i * chunkSize
-		end := (i + 1) * chunkSize
-
-		if end > len(data) {
-			end = len(data) // чтобы не выходить за рамки слайса
-		}
-
-		if start >= end { // для случаев когда CHUNKS > len(data) для поздних пустых чанков
-			wg.Done()
-			continue
-		}
-
-		go func(s []int) {
+		go func(i int, s []int) {
 			defer wg.Done()
-			max := s[0]
-			for _, v := range s[1:] {
-				if v > max {
-					max = v
-				}
+			start := i * chunkSize
+			end := (i + 1) * chunkSize
+
+			if end > len(data) {
+				end = len(data) // чтобы не выходить за рамки слайса
 			}
+
+			if start >= end { // для случаев когда CHUNKS > len(data) для поздних пустых чанков
+				wg.Done()
+				return
+			}
+
+			max := maximum(s[start:end])
+
 			sliceOfMaxes[i] = max
-		}(data[start:end])
+		}(i, data)
 	}
 	wg.Wait()
 	

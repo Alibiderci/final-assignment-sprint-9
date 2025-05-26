@@ -8,38 +8,109 @@ import (
 )
 
 func TestGenerateRandomElements(t *testing.T) {
+	testCases := []struct {
+		name string
+		inputSize int
+		expectNil bool 
+		expectedLength int
+		checkElementsRange bool
+	}{
+		{
+			name: "SizeOfZero",
+			inputSize: 0,
+			expectNil: true,
+		},
+		{
+			name: "NegativeSize",
+			inputSize: -5,
+			expectNil: true,
+		},
+		{
+			name: "PositiveSizeOne",
+			inputSize: 1,
+			expectNil: false,
+			expectedLength: 1,
+			checkElementsRange: true,
+		},
+		{
+			name: "PositiveSmallSize",
+			inputSize: 100,
+			expectNil: false,
+			expectedLength: 100,
+			checkElementsRange: true,
+		},
+		{
+			name: "PositiveBigSize",
+			inputSize: 100_000,
+			expectNil: false,
+			expectedLength: 100_000,
+			checkElementsRange: true,
+		},
 
-	t.Run("SizeOfZero", func(t *testing.T) {
-		slice := generateRandomElements(0)
-		assert.Nil(t, slice)
-	})
+	}
 
-	t.Run("NegativeSize", func(t *testing.T) {
-		slice := generateRandomElements(-5)
-		assert.Nil(t, slice)
-	})
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			actual := generateRandomElements(tc.inputSize)
 
-	size := 10
-	slice := generateRandomElements(size)
-	actualLength:= len(slice)
-	expectedLength := size
-
-	require.NotNil(t, slice)
-	assert.Equal(t, expectedLength, actualLength)
-
+			if tc.expectNil {
+				assert.Nil(t, actual)
+			} else {
+				require.NotNil(t, actual)
+				assert.Equal(t, tc.expectedLength, len(actual))
+				if tc.checkElementsRange {
+					for _, val := range actual {
+						assert.True(t, val >= 1 && val <= 1000)
+					}
+				}
+			}
+		})
+	}
 }
 
 func TestMaximum(t *testing.T) {
-	testSlice1 := []int{15, 2, 24, 30, 1, 8, 59, 100, 777, 500}
-	expected := 777
+	testCases := []struct {
+		name string
+		input []int
+		expected int
+	}{
+		{
+			name: "EmptySlice",
+			input: []int{},
+			expected: 0,
+		},
+		{
+			name: "SingleElement",
+			input: []int{5},
+			expected: 5,
+		},
+		{
+			name: "NegativeNumbers",
+			input: []int{-5, -2, -10, -1},
+			expected: -1,
+		},
+		{
+			name: "PositiveNumbers",
+			input: []int{5, 2, 10, 1},
+			expected: 10,
+		},
+		{
+			name: "MixedPositiveAndNegative",
+			input: []int{5, -2, -10, 1},
+			expected: 5,
+		},
+		{
+			name: "AllSameNumber",
+			input: []int{7, 7, 7, 7},
+			expected: 7,
+		},
+	}
 
-	actual := maximum(testSlice1)
-	assert.Equal(t, expected, actual) 
-
-	testSlice2 := []int{8, 59, 100, 340, 227}
-	expected = 340
-	actual = maximum(testSlice2)
-
-	assert.Equal(t, expected, actual)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			actual := maximum(tc.input)
+			assert.Equal(t, tc.expected, actual)
+		})
+	}
 }
 
