@@ -75,6 +75,11 @@ func TestMaximum(t *testing.T) {
 		expected int
 	}{
 		{
+			name: "NilCase",
+			input: nil,
+			expected: 0, 
+		},
+		{
 			name: "EmptySlice",
 			input: []int{},
 			expected: 0,

@@ -63,25 +63,23 @@ func maxChunks(data []int) int {
 
 	for i := 0; i < CHUNKS; i++ {
 		wg.Add(1)
+		start := i * chunkSize
+		end := (i + 1) * chunkSize
 
 		go func(i int, s []int) {
 			defer wg.Done()
-			start := i * chunkSize
-			end := (i + 1) * chunkSize
 
 			if end > len(data) {
 				end = len(data) // чтобы не выходить за рамки слайса
 			}
 
 			if start >= end { // для случаев когда CHUNKS > len(data) для поздних пустых чанков
-				wg.Done()
 				return
 			}
 
-			max := maximum(s[start:end])
+			sliceOfMaxes[i] = maximum(s)
 
-			sliceOfMaxes[i] = max
-		}(i, data)
+		}(i, data[start:end])
 	}
 	wg.Wait()
 	
